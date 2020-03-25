@@ -210,6 +210,7 @@ int DataFile::Find(string codigo) {
 
 			return curPointer;
 		}
+
 	}
 	file.close();
 	return 0;
