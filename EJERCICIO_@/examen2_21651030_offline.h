@@ -42,33 +42,6 @@ private:
 
 };
 
-class IndexFile {
-public:
-	IndexFile() {}
-
-	RecData reg;
-	char indexBuff[50];
-
-	char ID[14];
-	int Offset;
-
-	//empaqueta variables de clase
-	void indexPack();
-	//desempaqueta variables de buffer leido de archivo
-	void indexUnPack();
-	//crea un archivo usando como llave primaria cedula
-	// y el offset, este se crea secuecialmente, no necesita ser ordenado
-	void createIndexFile();
-
-	//carga archivo de indices a lista
-	list<IndexFile> getList();
-	//escribe a archivo lista recibida de parametro
-	void setList(list<IndexFile>);
-
-};
-
-
-
 
 
 

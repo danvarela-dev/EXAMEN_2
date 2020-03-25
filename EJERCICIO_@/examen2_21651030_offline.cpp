@@ -167,8 +167,7 @@ void DataFile::agregarRegistro() {
 		cout << "Error abriendo archivo: " << endl;
 		return;
 	}
-	IndexFile index;
-	list<IndexFile> listLoaded = index.getList();//carga indice a memoria
+	
 	file.seekp(0, ios::end);
 	int pos = file.tellp();
 	file.seekp(pos, ios::beg);
@@ -182,7 +181,7 @@ void DataFile::agregarRegistro() {
 		reg.buffer[i] = ' ';
 	}
 
-	strcpy(index.ID, reg.Cedula);
+	strcpy(index.ID, reg.Codigo);
 	index.Offset = pos;
 	listLoaded.push_back(index);//modifica lista de indice
 
@@ -198,10 +197,7 @@ int DataFile::buscar(string ID) {
 
 	ifstream file;
 
-	file.open("Index.dat", ifstream::in);
-	IndexFile index;
-
-	list<IndexFile> list = index.getList();
+	file.open("Registros.text", ifstream::in);
 
 
 	if (list.size() == 0)
@@ -241,9 +237,6 @@ void DataFile::eliminar(string ID) {
 
 	file.close();
 
-	list<IndexFile> list = index.getList();
-	index.setList(list);
-
 }
 
 void DataFile::compactar() {
@@ -251,22 +244,12 @@ void DataFile::compactar() {
 	ofstream indexFile;
 	ofstream o_file;
 	int curPointer = 0;
-	IndexFile index;
-	list<IndexFile> list = index.getList();
+
 
 	i_file.open("Registros.txt", ifstream::in);
-	indexFile.open("Index.dat", ifstream::out);
+
 	o_file.open("Registros-Compacted.txt", ofstream::out | ios::trunc);
 
-
-	for (auto it = list.begin(); it != list.end(); it++)
-	{
-		strcpy(index.ID, it->ID);
-		index.Offset = it->Offset;
-		index.indexPack();
-		if (index.indexBuff[0] != '*')
-			indexFile.write(index.indexBuff, 50);
-	}
 
 
 
@@ -284,7 +267,7 @@ void DataFile::compactar() {
 		strcpy(reg.buffer, buffer_aux);
 		reg.unPack();
 
-		if (reg.Cedula[0] != '*' && curPointer < filesize) {
+		if (reg.Codigo[0] != '*' && curPointer < filesize) {
 			o_file << buffer_aux;
 		}
 
@@ -294,143 +277,5 @@ void DataFile::compactar() {
 	i_file.close();
 	o_file.close();
 	indexFile.close();
-
-}
-
-void IndexFile::createIndexFile()
-{
-	ifstream iFile;
-	ofstream oFile;
-
-
-
-	iFile.open("Registros.txt", ifstream::in);
-	oFile.open("Index.dat", ifstream::trunc);
-
-	char buff[50];
-	iFile.seekg(0, ios::end);
-	int sz = iFile.tellg();
-	iFile.seekg(0, ios::beg);
-
-	int offset = 0;
-	int curPointer = 0;
-	while (sz > curPointer)
-	{
-		offset = iFile.tellg();
-		iFile.read(reg.buffer, 100);
-		reg.unPack();
-
-		strcpy(ID, reg.Cedula);
-		Offset = offset;
-		indexPack();
-
-
-		oFile.write(indexBuff, 50);
-
-		curPointer += 100;
-	}
-
-	iFile.close();
-	oFile.close();
-
-}
-
-
-void IndexFile::indexPack()
-{
-	char offsetStr[10];
-	offsetStr[0] = 0;
-	ID[strlen(ID)] = '\0';
-	indexBuff[0] = 0;
-	strcat(indexBuff, ID);
-	strcat(indexBuff, "|");
-	sprintf(offsetStr, "%d", Offset);
-	offsetStr[strlen(offsetStr)] = '\0';
-	strcat(indexBuff, offsetStr);
-	strcat(indexBuff, "|");
-
-	for (size_t i = strlen(indexBuff); i < 50; i++)
-		indexBuff[i] = ' ';
-
-	indexBuff[strlen(indexBuff)] = '\0';
-
-}
-
-void IndexFile::indexUnPack() {
-	char* c = indexBuff;
-	char temp[15];
-	char offsetStr[15];
-
-	int i = 0, j = 0;
-
-	while (c[i] != '|')
-	{
-		temp[j++] = c[i++];
-	}
-	temp[j] = '\0';
-	j = 0;
-	i++;
-	strcpy(ID, temp);
-
-
-	while (c[i] != '|')
-	{
-		temp[j++] = c[i++];
-	}
-	temp[j] = '\0';
-	j = 0;
-	strcpy(offsetStr, temp);
-	Offset = atoi(offsetStr);
-
-
-}
-
-list<IndexFile> IndexFile::getList() {
-
-
-	ifstream file;
-	IndexFile index;
-	list<IndexFile> lista;
-	createIndexFile();
-	file.open("Index.dat", ios::in);
-	int curPointer = 0;
-	file.seekg(0, ios::end);
-	int sz = file.tellg();
-	file.seekg(0, ios::beg);
-
-	while (sz > curPointer)
-	{
-		file.read(indexBuff, 50);
-		indexUnPack();
-		strcpy(index.ID, ID);
-		index.Offset = Offset;
-
-		lista.push_back(index);
-
-		curPointer += 50;
-	}
-
-	file.close();
-
-	return lista;
-}
-
-void IndexFile::setList(list<IndexFile> l) {
-	ofstream file;
-
-	createIndexFile();
-
-	file.open("Index.dat", ios::out | ios::trunc);
-
-	for (auto it = l.begin(); it != l.end(); it++)
-	{
-		strcpy(ID, it->ID);
-		Offset = it->Offset;
-		indexPack();
-
-		file.write(indexBuff, 50);
-	}
-
-	file.close();
 
 }
