@@ -7,55 +7,89 @@
 RecData::RecData() {
 
 	buffer[0] = 0;
-
-	Cedula[0] = 0;
+	Codigo[0] = 0;
 	Nombres[0] = 0;
 	Apellidos[0] = 0;
-	Direccion[0] = 0;
-	Ciudad[0] = 0;
-	Estado[0] = 0;
-	ZipCode[0] = 0;
+	Departamento[0] = 0;
+	Edad[0] = 0;
+	Sueldo[0] = 0;
 }
 
 void RecData::Pack() {
 
-	if (buffer[0] != 0)
-		buffer[0] = 0;
 
-	strcat(buffer, Cedula);
-	strcat(buffer, "|");
+	int a = strlen(Codigo) + 1;
+	char auxCodigo[10]{};
+
+	int j = 0;
+	for (size_t i = 0; i <= 10; i++)
+	{
+		if (i < a)
+			auxCodigo[i] = '0';
+		else
+			auxCodigo[i] = Codigo[j++];
+	}
+
+	strcat(buffer, auxCodigo);
+	strcat(buffer, ",");
 	strcat(buffer, Nombres);
-	strcat(buffer, "|");
+	strcat(buffer, ",");
 	strcat(buffer, Apellidos);
-	strcat(buffer, "|");
-	strcat(buffer, Direccion);
-	strcat(buffer, "|");
-	strcat(buffer, Ciudad);
-	strcat(buffer, "|");
-	strcat(buffer, Estado);
-	strcat(buffer, "|");
-	strcat(buffer, ZipCode);
-	strcat(buffer, "|");
+	strcat(buffer, ",");
+	strcat(buffer, Departamento);
+	strcat(buffer, ",");
+	strcat(buffer, Edad);
+	strcat(buffer, ",");
+
+	/*char enteros[6];
+	char decimal[2];
+
+	int x = 0, y = 0;
+
+	while (Sueldo[x] != '.' || x < strlen(Sueldo))
+	{
+		if (x < strlen(Sueldo))
+			enteros[x] = '0';
+		else {
+			enteros[y++] = Sueldo[x];
+		}
+	}
+	enteros[y] = '\0';
+	strcat(Sueldo, enteros);*/
+
+	strcat(buffer, Sueldo);
+
+
+	strcat(buffer, ",");
+
+	for (int i = strlen(buffer); i < 125; i++)
+		buffer[i] = '*';
+
+	buffer[strlen(buffer)] = '\n';
+
+
 
 }
 
 void RecData::unPack() {
 
 	char* c = buffer;
-	char temp[30];
+	char temp[50];
 	int i = 0, j = 0;
-
-	while (c[i] != '|')
+	while (c[i] != ',')
 	{
 		temp[j++] = c[i++];
 	}
 	temp[j] = '\0';
 	j = 0;
 	i++;
-	strcpy(Cedula, temp);
+	int a = 10 - strlen(temp);
+	for (int i = a; i >= 0; i--)
+		temp[i] = '0';
 
+	strcpy(Codigo, temp);
 
-	while (c[i] != '|')
+	while (c[i] != ',')
 	{
 		temp[j++] = c[i++];
 	}
@@ -64,7 +98,7 @@ void RecData::unPack() {
 	i++;
 	strcpy(Nombres, temp);
 
-	while (c[i] != '|')
+	while (c[i] != ',')
 	{
 		temp[j++] = c[i++];
 	}
@@ -72,41 +106,35 @@ void RecData::unPack() {
 	j = 0;
 	i++;
 	strcpy(Apellidos, temp);
+	while (c[i] != ',')
+	{
+		temp[j++] = c[i++];
+	}
+	temp[j] = '\0';
+	j = 0;
+	i++;
+	strcpy(Departamento, temp);
 
-	while (c[i] != '|')
+	while (c[i] != ',')
 	{
 		temp[j++] = c[i++];
 	}
 	temp[j] = '\0';
 	j = 0;
 	i++;
-	strcpy(Direccion, temp);
-	while (c[i] != '|')
-	{
-		temp[j++] = c[i++];
-	}
-	temp[j] = '\0';
-	j = 0;
-	i++;
-	strcpy(Ciudad, temp);
+	strcpy(Edad, temp);
 
-	while (c[i] != '|')
+	while (c[i] != ',')
 	{
 		temp[j++] = c[i++];
 	}
 	temp[j] = '\0';
 	j = 0;
 	i++;
-	strcpy(Estado, temp);
 
-	while (c[i] != '|')
-	{
-		temp[j++] = c[i++];
-	}
-	temp[j] = '\0';
-	j = 0;
-	i++;
-	strcpy(ZipCode, temp);
+
+	strcpy(Sueldo, temp);
+
 
 }
 void RecData::getOne()

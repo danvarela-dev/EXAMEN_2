@@ -205,7 +205,7 @@ int DataFile::Find(string codigo) {
 			cout << "Nombres: " << reg.Nombres << endl;
 			cout << "Apellidos: " << reg.Apellidos << endl;
 			cout << "Departamento: " << reg.Departamento << endl;
-			cout << "Edad: " << reg.Edad << endl;
+			cout << "Edad: " << reg.Edad << endl;	
 			cout << "Sueldo: " << reg.Sueldo << endl;
 
 			return curPointer;
@@ -246,7 +246,6 @@ void DataFile::Compact() {
 
 	while (!i_file.eof())
 	{
-
 
 		i_file.seekg(curPointer, ios::beg);
 		i_file.read(buffer_aux, 125);
