@@ -1,5 +1,6 @@
 #include "examen2_21651030_offline.h"
-
+#include <string>
+#include <iostream>
 #include <fstream>
 
 #pragma warning (disable : 4996)
@@ -19,7 +20,7 @@ void RecData::Pack() {
 
 
 	int a = strlen(Codigo) + 1;
-	char auxCodigo[10]{};
+	char auxCodigo[11];
 
 	int j = 0;
 	for (size_t i = 0; i <= 10; i++)
@@ -29,6 +30,7 @@ void RecData::Pack() {
 		else
 			auxCodigo[i] = Codigo[j++];
 	}
+	auxCodigo[10] = '\0';
 
 	strcat(buffer, auxCodigo);
 	strcat(buffer, ",");
@@ -42,35 +44,87 @@ void RecData::Pack() {
 	strcat(buffer, ",");
 
 	char enteros[6];
-	char decimal[2];
+	char decimal[3];
 
-	int x = 0, y = 0;
 
-	while (1)
+	bool dot = 0;
+	int x = 0;
+
+
+	while (x < strlen(Sueldo))
 	{
-		if (x < strlen(Sueldo))
-			enteros[x++] = '0';
-		else
-			enteros[x++] = Sueldo[y++];
+		if (Sueldo[x++] == '.')
+			dot = true;
+	}
 
-		if (strlen(Sueldo) > x || Sueldo[x] == '.') break;
+	if (!dot)
+		strcat(Sueldo, ".");
+
+
+	x = 0;
+
+	while (Sueldo[x] != '.')
+	{
+		enteros[x] = Sueldo[x];
+		x++;
 
 	}
-	enteros[y] = '\0';
-	
+	enteros[x] = '\0';
+	x++;
+	char enteroAux[7];
+	int y = 0;
+	int sz = 6 - strlen(enteros);
+	size_t i = 0;
+	for (i = 0; i < 6; i++)
+	{
+		if (i < sz)
+			enteroAux[i] = '0';
+		else
+			enteroAux[i] = enteros[y++];
 
-	strcat(Sueldo, enteros);
+	}
+	enteroAux[6] = '\0';
 
-	strcat(buffer, Sueldo);
+	if (dot) {
+		y = 0;
+		while (x < 9)
+		{
+			decimal[y++] = Sueldo[x++];
+		}
+
+		char decimalAux[3];
+
+		int sizeDec = strlen(decimal);
+		y = 0;
+		while (y < 3)
+		{
+			if (sizeDec < y)
+				decimalAux[y] = '0';
+			else
+				decimalAux[y] = decimal[y];
+			y++;
+		}
+		if (strlen(decimalAux) == 1)
+			decimalAux[1] = '0';
+
+		decimalAux[2] = '\0';
+
+		strcpy(Sueldo, enteroAux);
+		strcat(Sueldo, ".");
+		strcat(Sueldo, decimalAux);
+
+		strcat(buffer, Sueldo);
+	}
+	else {
+		strcat(buffer, enteroAux);
+		strcat(buffer, ".00");
+	}
 
 
 	strcat(buffer, ",");
 
 	for (int i = strlen(buffer); i < 125; i++)
 		buffer[i] = '*';
-
-	buffer[strlen(buffer)] = '\n';
-
 
 
 }
@@ -87,9 +141,6 @@ void RecData::unPack() {
 	temp[j] = '\0';
 	j = 0;
 	i++;
-	int a = 10 - strlen(temp);
-	for (int i = a; i >= 0; i--)
-		temp[i] = '0';
 
 	strcpy(Codigo, temp);
 
@@ -162,7 +213,7 @@ void RecData::getOne()
 
 DataFile::DataFile() {}
 
-void DataFile::agregarRegistro() {
+void DataFile::Add() {
 	ofstream file;
 
 	file.open("Registros.txt", ofstream::out | ofstream::app);
@@ -171,44 +222,84 @@ void DataFile::agregarRegistro() {
 		cout << "Error abriendo archivo: " << endl;
 		return;
 	}
-	
+
+
+
 	file.seekp(0, ios::end);
 	int pos = file.tellp();
 	file.seekp(pos, ios::beg);
 
+	if (pos == 0)
+		for (size_t i = 0; i < 4; i++)
+			head[0] = '-1';
+	file.write(head, 4);
+
 	reg.getOne();
+
 
 	int len = strlen(reg.buffer);
 
 	for (size_t i = len; i < 101; i++)
 	{
-		reg.buffer[i] = ' ';
+		reg.buffer[i] = '*';
 	}
 
 
 	file.write(reg.buffer, 100);
+	file << '\n';
 
-	
+
 
 	file.close();
 
 }
 
-int DataFile::buscar(string ID) {
+int DataFile::Find(char* codigo) {
 
 	ifstream file;
+	ofstream oFile;
 
 	file.open("Registros.text", ifstream::in);
 
-	return -1;
+
+	string line;
+
+
+	file.read(head, 4);
+	int offset = 0;
+
+
+	while (getline(file, line))
+	{
+		offset = file.tellg();
+		strcpy(reg.buffer, line.c_str());
+		reg.unPack();
+
+		if (strcmp(codigo, reg.Codigo) == 0) {
+			cout << "Codigo: " << reg.Codigo << endl;
+			cout << "Nombres: " << reg.Nombres << endl;
+			cout << "Apellidos: " << reg.Apellidos << endl;
+			cout << "Departamento: " << reg.Departamento << endl;
+			cout << "Edad: " << reg.Edad << endl;
+			cout << "Sueldo: " << reg.Sueldo << endl;
+
+
+			return offset;
+
+		}
+
+
+	}
+
 
 	file.close();
 
+	return -1;
 }
 
-void DataFile::eliminar(string ID) {
+void DataFile::Remove(char* ID) {
 
-	int offsetToMark = buscar(ID);
+	int offsetToMark = Find(ID);
 	ofstream file;
 
 	file.open("Registros.txt", ofstream::cur);
@@ -225,7 +316,7 @@ void DataFile::eliminar(string ID) {
 
 }
 
-void DataFile::compactar() {
+void DataFile::Compact() {
 	ifstream i_file;
 	ofstream indexFile;
 	ofstream o_file;
@@ -233,33 +324,49 @@ void DataFile::compactar() {
 
 
 	i_file.open("Registros.txt", ifstream::in);
+	o_file.open("Registros-Compacted.txt", ifstream::out | ifstream::trunc);
 
-	o_file.open("Registros-Compacted.txt", ofstream::out | ios::trunc);
-
-
-	i_file.seekg(0, ios::end);
-	int filesize = i_file.tellg();
-	i_file.seekg(0, ios::beg);
-
-
-	while (!i_file.eof())
+	string line;
+	int offset = 0;
+	while (getline(i_file, line))
 	{
-
-		i_file.seekg(curPointer, ios::beg);
-		i_file.read(buffer_aux, 100);
-		buffer_aux[99] = '\0';
-		strcpy(reg.buffer, buffer_aux);
-		reg.unPack();
-
-		if (reg.Codigo[0] != '*' && curPointer < filesize) {
-			o_file << buffer_aux;
+		offset = i_file.tellg();
+		if (line[0] != 'D') {
+			o_file << line << '\n';
 		}
-
-		curPointer += 100;
 	}
 
 	i_file.close();
 	o_file.close();
 	indexFile.close();
+
+}
+
+void DataFile::PrintAll() {
+
+	ifstream f;
+	f.open("Registros.txt", ifstream::in);
+	string line;
+	char codAux[11];
+
+	while (getline(f, line))
+	{
+		strcpy(reg.buffer, line.c_str());
+
+		reg.unPack();
+
+
+		cout << "************************* REGISTRO ******************************" << endl;
+		cout << "Codigo: " << reg.Codigo << endl;
+		cout << "Nombres: " << reg.Nombres << endl;
+		cout << "Apellidos: " << reg.Apellidos << endl;
+		cout << "Departamento: " << reg.Departamento << endl;
+		cout << "Edad: " << reg.Edad << endl;
+		cout << "Sueldo: " << reg.Sueldo << endl;
+
+	}
+
+	f.close();
+
 
 }

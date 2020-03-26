@@ -18,10 +18,10 @@ public:
 	char buffer[125];
 
 
-	char Codigo[10];
-	char Nombres[50];
-	char Apellidos[50];
-	char Departamento[3];
+	char Codigo[11];
+	char Nombres[49];
+	char Apellidos[49];
+	char Departamento[4];
 	char Edad[3];
 	char Sueldo[9];
 };
@@ -31,11 +31,15 @@ public:
 	DataFile();
 
 	//agrega registro a archivo
-	void agregarRegistro();
-	int buscar(string);
-	void eliminar(string);
-	void compactar();//compacta el archivo de registros y tambien el de indices
+	void Add();
+	int Find(char * );
+	void Remove(char *);
+	void Compact();//compacta el archivo de registros y tambien el de indices
+	void PrintAll();
 	char buffer_aux[125];
+
+	char head[4];
+	list<DataFile> disponibles;
 
 private:
 	RecData reg;

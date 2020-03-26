@@ -143,11 +143,7 @@ void RecData::unPack() {
 	temp[j] = '\0';
 	j = 0;
 	i++;
-	int a = 10 - strlen(temp);
-	for (int i = a; i >= 0; i--)
-		temp[i] = '0';
 
-	
 
 	strcpy(Codigo, temp);
 
@@ -268,12 +264,7 @@ int DataFile::Find(char* codigo) {
 
 		if (strcmp(codigo,reg.Codigo) == 0 ){
 			
-			cout << "Codigo: " << reg.Codigo << endl;
-			cout << "Nombres: " << reg.Nombres << endl;
-			cout << "Apellidos: " << reg.Apellidos << endl;
-			cout << "Departamento: " << reg.Departamento << endl;
-			cout << "Edad: " << reg.Edad << endl;
-			cout << "Sueldo: " << reg.Sueldo << endl;
+			
 
 			return curPointer;
 		}
@@ -305,15 +296,12 @@ void DataFile::Compact() {
 	i_file.open("Registros.txt", ifstream::in);
 	o_file.open("Registros-Compacted.txt", ofstream::out | ios::trunc);
 
-	i_file.seekg(0, ios::end);
-	int filesize = i_file.tellg();
-	i_file.seekg(0, ios::beg);
 
 	string line;
 
 	while (getline(i_file, line))
 	{	
-		if (line[0] != 'D' /*&& curPointer < filesize*/) 
+		if (line[0] != 'D') 
 			o_file << line << '\n';
 		
 	}
