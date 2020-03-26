@@ -256,6 +256,7 @@ void DataFile::Add() {
 
 int DataFile::Find(char* codigo) {
 
+
 	ifstream file;
 	ofstream oFile;
 
