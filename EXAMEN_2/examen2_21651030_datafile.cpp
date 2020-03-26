@@ -250,19 +250,20 @@ int DataFile::Find(char* codigo) {
 		return 0;
 	}
 	int curPointer = 0;
-	char codAux[11];
-	codAux[0] = 0;
-
+	
+	string codaux;
 	while (!file.eof())
 	{
 		curPointer = file.tellg();
 		file.read(reg.buffer, 125);
 	
 		reg.unPack();
-		strcpy(codAux, reg.Codigo);
+		codaux = reg.Codigo;
+		codaux[10] = '\0';
 
-		if (codigo == codAux) {
-			cout << "Codigo: " << codAux << endl;
+		if (strcmp(codigo,codaux.c_str()) == 0 ){
+			
+			cout << "Codigo: " << codaux.c_str() << endl;
 			cout << "Nombres: " << reg.Nombres << endl;
 			cout << "Apellidos: " << reg.Apellidos << endl;
 			cout << "Departamento: " << reg.Departamento << endl;
