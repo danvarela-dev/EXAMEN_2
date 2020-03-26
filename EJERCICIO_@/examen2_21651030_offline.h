@@ -40,7 +40,7 @@ public:
 
 	char head[4];
 	list<DataFile> disponibles;
-
+	 
 private:
 	RecData reg;
 
