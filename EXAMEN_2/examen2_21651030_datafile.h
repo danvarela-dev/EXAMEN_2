@@ -18,8 +18,8 @@ public:
 
 	char buffer[125];
 
-	char Codigo[10];
-	char Nombres[50];
+	char Codigo[11];
+	char Nombres[49];
 	char Apellidos[49];
 	char Departamento[4];
 	char Edad[3];

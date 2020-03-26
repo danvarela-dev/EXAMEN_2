@@ -1,4 +1,6 @@
 #include "examen2_21651030_datafile.h"
+#include <iostream>
+#include <string>
 #include <fstream>
 
 #pragma warning (disable : 4996)
@@ -19,7 +21,7 @@ void RecData::Pack() {
 
 	int a = 10 - strlen(Codigo);
 	char auxCodigo[11];
-	auxCodigo[0] = 0;
+
 
 	int j = 0;
 	for (size_t i = 0; i < 10; i++)
@@ -29,6 +31,7 @@ void RecData::Pack() {
 		else
 			auxCodigo[i] = Codigo[j++];
 	}
+
 	auxCodigo[10] = '\0';
 	strcat(buffer, auxCodigo);
 	strcat(buffer, ",");
@@ -125,7 +128,7 @@ void RecData::Pack() {
 		buffer[i] = '*';
 
 
-	buffer[124] = '\n';
+
 }
 
 void RecData::unPack() {
@@ -144,6 +147,8 @@ void RecData::unPack() {
 	for (int i = a; i >= 0; i--)
 		temp[i] = '0';
 
+	
+
 	strcpy(Codigo, temp);
 
 	while (c[i] != ',')
@@ -153,6 +158,7 @@ void RecData::unPack() {
 	temp[j] = '\0';
 	j = 0;
 	i++;
+	;
 	strcpy(Nombres, temp);
 
 	while (c[i] != ',')
@@ -234,6 +240,7 @@ void DataFile::Add() {
 	}
 
 	file.write(reg.buffer, 125);
+	file.write("\n", 1);
 
 	file.close();
 
@@ -251,19 +258,17 @@ int DataFile::Find(char* codigo) {
 	}
 	int curPointer = 0;
 	
-	string codaux;
-	while (!file.eof())
+	string line;
+	while (getline(file, line))
 	{
-		curPointer = file.tellg();
-		file.read(reg.buffer, 125);
-	
+		
+		strcpy(reg.buffer, line.c_str());
 		reg.unPack();
-		codaux = reg.Codigo;
-		codaux[10] = '\0';
+	
 
-		if (strcmp(codigo,codaux.c_str()) == 0 ){
+		if (strcmp(codigo,reg.Codigo) == 0 ){
 			
-			cout << "Codigo: " << codaux.c_str() << endl;
+			cout << "Codigo: " << reg.Codigo << endl;
 			cout << "Nombres: " << reg.Nombres << endl;
 			cout << "Apellidos: " << reg.Apellidos << endl;
 			cout << "Departamento: " << reg.Departamento << endl;
@@ -272,7 +277,8 @@ int DataFile::Find(char* codigo) {
 
 			return curPointer;
 		}
-
+		
+		curPointer = file.tellg();
 	}
 	file.close();
 	
@@ -283,10 +289,10 @@ void DataFile::Remove(char * nombre) {
 	int offsetToMark = Find(nombre);
 
 	ofstream file;
-	file.open("Registros.txt", ofstream::cur);
+	file.open("Registros.txt", fstream::cur);
 	file.seekp(offsetToMark, ios::cur);
 
-	file << "D";
+	file << 'D';
 
 	file.close();
 
@@ -295,29 +301,21 @@ void DataFile::Remove(char * nombre) {
 void DataFile::Compact() {
 	ifstream i_file;
 	ofstream o_file;
-	int curPointer = 0;
-
-
+	
 	i_file.open("Registros.txt", ifstream::in);
 	o_file.open("Registros-Compacted.txt", ofstream::out | ios::trunc);
-
 
 	i_file.seekg(0, ios::end);
 	int filesize = i_file.tellg();
 	i_file.seekg(0, ios::beg);
 
+	string line;
 
-	while (!i_file.eof())
-	{
-
-		i_file.seekg(curPointer, ios::beg);
-		i_file.read(buffer_aux, 125);
-
-		if (buffer_aux[0] != 'D' && curPointer < filesize) {
-			o_file << buffer_aux;
-		}
-
-		curPointer += 125;
+	while (getline(i_file, line))
+	{	
+		if (line[0] != 'D' /*&& curPointer < filesize*/) 
+			o_file << line << '\n';
+		
 	}
 
 	i_file.close();
@@ -331,15 +329,17 @@ void DataFile::PrintAll() {
 
 	ifstream f;
 	f.open("Registros.txt", ifstream::in);
-
-	while (1)
+	string line;
+	char codAux[11];
+	
+	while (getline(f, line))
 	{
-		f.read(buffer_aux, 125);
-		buffer_aux[strlen(buffer_aux)] = '\0';
-		strcpy(reg.buffer, buffer_aux);
+		strcpy(reg.buffer,line.c_str());
+
 		reg.unPack();
-
-
+		
+	
+		cout << "************************* REGISTRO ******************************" << endl;
 		cout << "Codigo: " << reg.Codigo << endl;
 		cout << "Nombres: " << reg.Nombres << endl;
 		cout << "Apellidos: " << reg.Apellidos << endl;
@@ -347,10 +347,8 @@ void DataFile::PrintAll() {
 		cout << "Edad: " << reg.Edad << endl;
 		cout << "Sueldo: " << reg.Sueldo << endl;
 
-
 	}
 
-
-
+	f.close();
 
 }
