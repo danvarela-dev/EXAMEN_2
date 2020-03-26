@@ -20,8 +20,8 @@ public:
 
 	char Codigo[10];
 	char Nombres[50];
-	char Apellidos[50];
-	char Departamento[3];
+	char Apellidos[49];
+	char Departamento[4];
 	char Edad[3];
 	char Sueldo[9];
 };
@@ -32,8 +32,8 @@ public:
 	DataFile() = default;
 
 	void Add();
-	int Find(string);
-	void Remove(string);
+	int Find(char *);
+	void Remove(char *);
 	void Compact();
 	void PrintAll();
 

@@ -41,21 +41,25 @@ void RecData::Pack() {
 	strcat(buffer, Edad);
 	strcat(buffer, ",");
 
-	/*char enteros[6];
+	char enteros[6];
 	char decimal[2];
 
 	int x = 0, y = 0;
 
-	while (Sueldo[x] != '.' || x < strlen(Sueldo))
+	while (1)
 	{
 		if (x < strlen(Sueldo))
-			enteros[x] = '0';
-		else {
-			enteros[y++] = Sueldo[x];
-		}
+			enteros[x++] = '0';
+		else
+			enteros[x++] = Sueldo[y++];
+
+		if (strlen(Sueldo) > x || Sueldo[x] == '.') break;
+
 	}
 	enteros[y] = '\0';
-	strcat(Sueldo, enteros);*/
+	
+
+	strcat(Sueldo, enteros);
 
 	strcat(buffer, Sueldo);
 
@@ -181,13 +185,10 @@ void DataFile::agregarRegistro() {
 		reg.buffer[i] = ' ';
 	}
 
-	strcpy(index.ID, reg.Codigo);
-	index.Offset = pos;
-	listLoaded.push_back(index);//modifica lista de indice
 
 	file.write(reg.buffer, 100);
 
-	index.setList(listLoaded);//escribe a archivo lista actualizada
+	
 
 	file.close();
 
@@ -199,19 +200,6 @@ int DataFile::buscar(string ID) {
 
 	file.open("Registros.text", ifstream::in);
 
-
-	if (list.size() == 0)
-		return -1;
-
-
-
-	for (auto it = list.begin(); it != list.end(); it++)
-	{
-		if (it->ID == ID) {
-			return it->Offset;
-		}
-	}
-
 	return -1;
 
 	file.close();
@@ -222,8 +210,6 @@ void DataFile::eliminar(string ID) {
 
 	int offsetToMark = buscar(ID);
 	ofstream file;
-	IndexFile index;
-
 
 	file.open("Registros.txt", ofstream::cur);
 	file.seekp(offsetToMark, ios::cur);
@@ -249,8 +235,6 @@ void DataFile::compactar() {
 	i_file.open("Registros.txt", ifstream::in);
 
 	o_file.open("Registros-Compacted.txt", ofstream::out | ios::trunc);
-
-
 
 
 	i_file.seekg(0, ios::end);

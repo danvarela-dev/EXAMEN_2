@@ -15,19 +15,21 @@ RecData::RecData() {
 
 void RecData::Pack() {
 
-	
-	int a = strlen(Codigo) + 1;
-	char auxCodigo[10]{};
+	buffer[0] = 0;
+
+	int a = 10 - strlen(Codigo);
+	char auxCodigo[11];
+	auxCodigo[0] = 0;
 
 	int j = 0;
-	for (size_t i = 0; i <= 10; i++)
+	for (size_t i = 0; i < 10; i++)
 	{
 		if (i < a)
 			auxCodigo[i] = '0';
 		else
 			auxCodigo[i] = Codigo[j++];
 	}
-
+	auxCodigo[10] = '\0';
 	strcat(buffer, auxCodigo);
 	strcat(buffer, ",");
 	strcat(buffer, Nombres);
@@ -39,34 +41,91 @@ void RecData::Pack() {
 	strcat(buffer, Edad);
 	strcat(buffer, ",");
 
-	/*char enteros[6];
-	char decimal[2];
-	
-	int x = 0, y = 0;
+	char enteros[6];
+	char decimal[3];
 
-	while (Sueldo[x] != '.' || x < strlen(Sueldo))
+
+	bool dot = 0;
+	int x = 0;
+
+
+	while (x < strlen(Sueldo))
 	{
-		if (x < strlen(Sueldo))
-			enteros[x] = '0';
-		else {
-			enteros[y++] = Sueldo[x];
-		}
+		if (Sueldo[x++] == '.')
+			dot = true;
 	}
-	enteros[y] = '\0';
-	strcat(Sueldo, enteros);*/
 
-	strcat(buffer, Sueldo);
+	if (!dot)
+		strcat(Sueldo, ".");
+
+
+	x = 0;
+
+	while (Sueldo[x] != '.')
+	{
+		enteros[x] = Sueldo[x];
+		x++;
+
+	}
+	enteros[x] = '\0';
+	x++;
+	char enteroAux[7];
+	int y = 0;
+	int sz = 6 - strlen(enteros);
+	size_t i = 0;
+	for (i = 0; i < 6; i++)
+	{
+		if (i < sz)
+			enteroAux[i] = '0';
+		else
+			enteroAux[i] = enteros[y++];
+
+	}
+	enteroAux[6] = '\0';
+
+	if (dot) {
+		y = 0;
+		while (x < 9)
+		{
+			decimal[y++] = Sueldo[x++];
+		}
+
+		char decimalAux[3];
+
+		int sizeDec = strlen(decimal);
+		y = 0;
+		while (y < 3)
+		{
+			if (sizeDec < y)
+				decimalAux[y] = '0';
+			else
+				decimalAux[y] = decimal[y];
+			y++;
+		}
+		if (strlen(decimalAux) == 1)
+			decimalAux[1] = '0';
+
+		decimalAux[2] = '\0';
+
+		strcpy(Sueldo, enteroAux);
+		strcat(Sueldo, ".");
+		strcat(Sueldo, decimalAux);
+
+		strcat(buffer, Sueldo);
+	}
+	else {
+		strcat(buffer, enteroAux);
+		strcat(buffer, ".00");
+	}
 
 
 	strcat(buffer, ",");
 
-	for(int i = strlen(buffer); i < 125 ; i++)
+	for (int i = strlen(buffer); i < 125; i++)
 		buffer[i] = '*';
 
-	buffer[strlen(buffer)] = '\n';
 
-	
-
+	buffer[124] = '\n';
 }
 
 void RecData::unPack() {
@@ -129,7 +188,7 @@ void RecData::unPack() {
 	temp[j] = '\0';
 	j = 0;
 	i++;
-	
+
 
 	strcpy(Sueldo, temp);
 
@@ -166,8 +225,6 @@ void DataFile::Add() {
 		return;
 	}
 
-	
-
 	reg.getOne();
 
 	int len = strlen(reg.buffer);
@@ -182,7 +239,7 @@ void DataFile::Add() {
 
 }
 
-int DataFile::Find(string codigo) {
+int DataFile::Find(char* codigo) {
 
 	ifstream file;
 
@@ -193,19 +250,23 @@ int DataFile::Find(string codigo) {
 		return 0;
 	}
 	int curPointer = 0;
+	char codAux[11];
+	codAux[0] = 0;
 
 	while (!file.eof())
 	{
 		curPointer = file.tellg();
 		file.read(reg.buffer, 125);
-
+	
 		reg.unPack();
-		if (codigo == reg.Codigo) {
-			cout << "Codigo: " << reg.Codigo << endl;
+		strcpy(codAux, reg.Codigo);
+
+		if (codigo == codAux) {
+			cout << "Codigo: " << codAux << endl;
 			cout << "Nombres: " << reg.Nombres << endl;
 			cout << "Apellidos: " << reg.Apellidos << endl;
 			cout << "Departamento: " << reg.Departamento << endl;
-			cout << "Edad: " << reg.Edad << endl;	
+			cout << "Edad: " << reg.Edad << endl;
 			cout << "Sueldo: " << reg.Sueldo << endl;
 
 			return curPointer;
@@ -213,10 +274,11 @@ int DataFile::Find(string codigo) {
 
 	}
 	file.close();
+	
 	return 0;
 }
 
-void DataFile::Remove(string nombre) {
+void DataFile::Remove(char * nombre) {
 	int offsetToMark = Find(nombre);
 
 	ofstream file;
@@ -265,7 +327,7 @@ void DataFile::Compact() {
 
 void DataFile::PrintAll() {
 
-	
+
 	ifstream f;
 	f.open("Registros.txt", ifstream::in);
 
@@ -275,7 +337,7 @@ void DataFile::PrintAll() {
 		buffer_aux[strlen(buffer_aux)] = '\0';
 		strcpy(reg.buffer, buffer_aux);
 		reg.unPack();
-		
+
 
 		cout << "Codigo: " << reg.Codigo << endl;
 		cout << "Nombres: " << reg.Nombres << endl;

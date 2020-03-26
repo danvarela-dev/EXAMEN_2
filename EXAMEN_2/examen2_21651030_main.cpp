@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 	char m_command[200];
 	char m_param1[200];
 	char* ptr;
-
+	help();
 
 	while (1)
 	{
