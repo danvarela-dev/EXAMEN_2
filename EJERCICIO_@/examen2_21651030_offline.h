@@ -15,36 +15,42 @@ public:
 	void Pack();
 	void unPack();
 	void getOne();
-	char buffer[125];
+
+	char buffer[101];
 
 
-	char Codigo[11];
-	char Nombres[49];
-	char Apellidos[49];
-	char Departamento[4];
-	char Edad[3];
-	char Sueldo[9];
+	char Cedula[14];
+	char Nombres[20];
+	char Apellidos[20];
+	char Direccion[20];
+	char Ciudad[14];
+	char Estado[7];
+	char ZipCode[5];
 };
 
 class DataFile {
 public:
 	DataFile();
 
-	//agrega registro a archivo
-	void Add();
-	int Find(char * );
-	void Remove(char *);
-	void Compact();//compacta el archivo de registros y tambien el de indices
 	void PrintAll();
-	char buffer_aux[125];
+	void Add();
+	int Find(char *);
+	void Remove(char *);
+	void Compact();
+	char buffer_aux[100];
 
 	char head[4];
-	list<DataFile> disponibles;
-	 
+	
+	list<int> freeSpaces;
+
+	list<int> getFreeSpaces();
+
 private:
 	RecData reg;
 
 };
+
+
 
 
 

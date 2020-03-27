@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string.h>
 
+#include <list>
 
 
 using namespace std;
@@ -38,6 +39,8 @@ public:
 	void PrintAll();
 
 	char buffer_aux[125];
+
+
 
 private:
 	RecData reg;

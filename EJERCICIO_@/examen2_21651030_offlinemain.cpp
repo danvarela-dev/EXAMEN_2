@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 
 		if (!strcmp("print", m_command)) 	t.PrintAll();
 		if (!strcmp("add", m_command)) 	t.Add();
-		if (!strcmp("find", m_command))		t.Find(m_param1);
+		if (!strcmp("find", m_command))		cout << "OFFSET:" << t.Find(m_param1) <<endl;
 		if (!strcmp("remove", m_command))	t.Remove(m_param1);
 		if (!strcmp("compact", m_command))	t.Compact();
 		if (!strcmp("help", m_command))	help();
